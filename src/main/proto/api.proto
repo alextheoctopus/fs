@@ -1,0 +1,50 @@
+syntax = "proto3";
+package com.custom.api;
+
+message StringColumn {repeated string values = 1;}
+message IntColumn    {repeated int32  values = 1;}
+message LongColumn   {repeated int64  values = 1;}
+message FloatColumn  {repeated float  values = 1;}
+message DoubleColumn {repeated double values = 1;}
+message BoolColumn   {repeated bool   values = 1;}
+message BytesColumn  {repeated bytes  values = 1;}
+
+message FeatureColumn {
+  oneof kind {
+    StringColumn string_values = 1;
+    IntColumn    int_values = 2;
+    LongColumn   long_values = 3;
+    FloatColumn  float_values = 4;
+    DoubleColumn double_values = 5;
+    BoolColumn   bool_values = 6;
+    BytesColumn  bytes_values = 7;
+  }
+}
+
+
+message PutRequest {
+  repeated string entity_keys = 1;
+  repeated string features = 2;
+  repeated FeatureColumn columns = 3;
+}
+
+message GetRequest{
+  repeated string entity_keys = 1;
+  repeated string features = 2;
+}
+
+message GetResponse {
+  repeated string entity_keys = 1;
+  repeated string features = 2;
+  repeated FeatureColumn columns = 3;
+}
+
+message PutResponse {
+  uint32 written_entities = 1; // сколько entity записано
+  bool success = 2;// статус
+}
+
+service FeatureStore {
+  rpc Put(PutRequest) returns (PutResponse);
+  rpc Get(GetRequest) returns (GetResponse);
+}
