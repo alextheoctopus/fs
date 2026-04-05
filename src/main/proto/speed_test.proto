@@ -1,55 +1,55 @@
-syntax = "proto3";
-package com.custom.speedtest;
-
-message FeatureColumn {
-  oneof kind {
-    StringColumn string_values = 1;
-    IntColumn    int_values = 2;
-    LongColumn   long_values = 3;
-    FloatColumn  float_values = 4;
-    DoubleColumn double_values = 5;
-    BoolColumn   bool_values = 6;
-    BytesColumn  bytes_values = 7;
-  }
-}
-
-message StringColumn {repeated string values = 1;}
-message IntColumn    {repeated int32  values = 1;}
-message LongColumn   {repeated int64  values = 1;}
-message FloatColumn  {repeated float  values = 1;}
-message DoubleColumn {repeated double values = 1;}
-message BoolColumn   {repeated bool   values = 1;}
-message BytesColumn  {repeated bytes  values = 1;}
-
-message PutRequestColumnDict {
-  repeated string entity_keys = 1;
-  repeated string features = 2;
-  repeated FeatureColumn columns = 3;
-}
-// буду переносить такое же в row. Надо будет замерить по-новому. Можно еще добавить int,long значения.
-// Замерить также и объем памяти.
-
-message FeatureType{
-  oneof kind{
-    string string_value = 1;
-    int32  int_value = 2;
-    int64  long_value = 3;
-    float  float_value = 4;
-    double double_value = 5;
-    bool   bool_value = 6;
-    bytes  bytes_value = 7;
-  }
-}
-
-message Entity {
-  string entity_key = 1;
-
-  repeated FeatureType values = 2;
-}
-
-// Row запрос: словарь имён фич + строки, где фичи хранятся позиционно.
-message PutRequestRowDict {
-  repeated string features = 1;
-  repeated Entity rows = 2;
-}
-
+//syntax = "proto3";
+//package com.custom.speedtest;
+//
+//message FeatureColumn {
+//  oneof kind {
+//    StringColumn string_values = 1;
+//    IntColumn    int_values = 2;
+//    LongColumn   long_values = 3;
+//    FloatColumn  float_values = 4;
+//    DoubleColumn double_values = 5;
+//    BoolColumn   bool_values = 6;
+//    BytesColumn  bytes_values = 7;
+//  }
+//}
+//
+//message StringColumn {repeated string values = 1;}
+//message IntColumn    {repeated int32  values = 1;}
+//message LongColumn   {repeated int64  values = 1;}
+//message FloatColumn  {repeated float  values = 1;}
+//message DoubleColumn {repeated double values = 1;}
+//message BoolColumn   {repeated bool   values = 1;}
+//message BytesColumn  {repeated bytes  values = 1;}
+//
+//message PutRequestColumnDict {
+//  repeated string entity_keys = 1;
+//  repeated string features = 2;
+//  repeated FeatureColumn columns = 3;
+//}
+//// буду переносить такое же в row. Надо будет замерить по-новому. Можно еще добавить int,long значения.
+//// Замерить также и объем памяти.
+//
+//message FeatureType{
+//  oneof kind{
+//    string string_value = 1;
+//    int32  int_value = 2;
+//    int64  long_value = 3;
+//    float  float_value = 4;
+//    double double_value = 5;
+//    bool   bool_value = 6;
+//    bytes  bytes_value = 7;
+//  }
+//}
+//
+//message Entity {
+//  string entity_key = 1;
+//
+//  repeated FeatureType values = 2;
+//}
+//
+//// Row запрос: словарь имён фич + строки, где фичи хранятся позиционно.
+//message PutRequestRowDict {
+//  repeated string features = 1;
+//  repeated Entity rows = 2;
+//}
+//

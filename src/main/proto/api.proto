@@ -1,5 +1,5 @@
 syntax = "proto3";
-package com.custom.api;
+package com.proto.api;
 
 message StringColumn {repeated string values = 1;}
 message IntColumn    {repeated int32  values = 1;}
@@ -9,8 +9,8 @@ message DoubleColumn {repeated double values = 1;}
 message BoolColumn   {repeated bool   values = 1;}
 message BytesColumn  {repeated bytes  values = 1;}
 
-message FeatureColumn {
-  oneof kind {
+message FeatureType {
+  oneof values {
     StringColumn string_values = 1;
     IntColumn    int_values = 2;
     LongColumn   long_values = 3;
@@ -21,11 +21,13 @@ message FeatureColumn {
   }
 }
 
+message FeatureColumn{
+  repeated FeatureType values = 1;
+}
 
 message PutRequest {
   repeated string entity_keys = 1;
-  repeated string features = 2;
-  repeated FeatureColumn columns = 3;
+  map<string, FeatureColumn> columns = 3;
 }
 
 message GetRequest{
@@ -35,16 +37,22 @@ message GetRequest{
 
 message GetResponse {
   repeated string entity_keys = 1;
-  repeated string features = 2;
-  repeated FeatureColumn columns = 3;
+  map<string, FeatureColumn> columns = 3;
 }
 
+
+
 message PutResponse {
-  uint32 written_entities = 1; // сколько entity записано
-  bool success = 2;// статус
+  uint32 written_entities = 1;
+  bool success = 2;
 }
 
 service FeatureStore {
   rpc Put(PutRequest) returns (PutResponse);
   rpc Get(GetRequest) returns (GetResponse);
+}
+
+message EntityRecordRedis{
+  string key = 1;
+  bytes value = 2;
 }

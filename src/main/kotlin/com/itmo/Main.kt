@@ -1,4 +1,4 @@
-package com.custom
+package com.itmo
 
 fun main() {
     println("Hello World!")

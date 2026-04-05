@@ -6,7 +6,7 @@ plugins {
     id("me.champeau.jmh") version "0.7.2"
 }
 
-group = "com.custom"
+group = "com.itmo.proto"
 version = "Speed-test"
 
 repositories {
@@ -36,6 +36,9 @@ dependencies {
     compileOnly("org.apache.tomcat:annotations-api:6.0.53")
     jmh("org.openjdk.jmh:jmh-core:1.37")
     jmh("org.openjdk.jmh:jmh-generator-annprocess:1.37")
+
+    //Redis/Jedis
+    implementation("redis.clients:jedis:5.1.0")
     testImplementation(kotlin("test"))
 }
 protobuf {
@@ -61,7 +64,7 @@ protobuf {
 }
 application {
     // set your main later, e.g. "com.example.MainKt"
-    mainClass = "com.custom.MainKt"
+    mainClass = "com.itmo.MainKt"
 }
 tasks.test {
     useJUnitPlatform()
