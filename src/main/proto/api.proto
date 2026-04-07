@@ -40,8 +40,6 @@ message GetResponse {
   map<string, FeatureColumn> columns = 3;
 }
 
-
-
 message PutResponse {
   uint32 written_entities = 1;
   bool success = 2;
@@ -55,4 +53,20 @@ service FeatureStore {
 message EntityRecordRedis{
   string key = 1;
   bytes value = 2;
+}
+
+message FeatureTypeSingle {
+  oneof values {
+    string string_value = 1;
+    int32 int_value = 2;
+    int64 long_value = 3;
+    float float_value = 4;
+    double double_value = 5;
+    bool bool_value = 6;
+    bytes bytes_value = 7;
+  }
+}
+
+message RedisPayload{
+  map<string, FeatureTypeSingle> features = 1;
 }
