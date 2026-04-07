@@ -3,19 +3,32 @@ package com.itmo.client
 import com.itmo.featurestore.FeatureStoreService
 import com.proto.api.Api
 import com.proto.api.Api.FeatureColumn
+import com.proto.api.Api.GetRequest
 import com.proto.api.Api.IntColumn
 import com.proto.api.Api.PutRequest
 import com.proto.api.FeatureStoreGrpc
+import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
 
 class ClientService {
-    fun put(/*сюда можно аргументы, которые entities,features, values*/) {
-        val channel = ManagedChannelBuilder
-            .forAddress("localhost", 9090)
-            .usePlaintext()
-            .build()
+    private val channel = ManagedChannelBuilder
+        .forAddress("localhost", 9090)
+        .usePlaintext()
+        .build()
 
-        val stub = FeatureStoreGrpc.newBlockingStub(channel)
+    private val stub = FeatureStoreGrpc.newBlockingStub(channel)
+
+    fun get() {
+        val request = GetRequest.newBuilder().addAllEntityKeys(mutableListOf("patient1", "patient2")).addAllFeatures(
+            mutableListOf("age", "height")
+        ).build()
+        val response = stub.get(request)
+        println(response.entityKeysCount)
+        channel.shutdown()
+    }
+
+    fun put(/*сюда можно аргументы, которые entities,features, values*/) {
+
 
         val request = PutRequest.newBuilder()
             .addAllEntityKeys(mutableListOf("patient1", "patient2", "patient3"))
@@ -76,5 +89,6 @@ class ClientService {
 
 fun main() {
     val clientService = ClientService()
-    clientService.put()
+    clientService.get()
+
 }
