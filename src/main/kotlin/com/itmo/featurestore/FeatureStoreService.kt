@@ -1,10 +1,15 @@
 package com.itmo.featurestore
 
+import com.google.apps.card.v1.Columns.Column
 import com.proto.api.Api
 import com.proto.api.Api.PutResponse
 import com.proto.api.FeatureStoreGrpc
 import com.itmo.featurestore.mapper.RedisRequestMapper
 import com.itmo.featurestore.storage.RedisStorage
+import com.proto.api.Api.EntityRecordRedis
+import com.proto.api.Api.FeatureColumn
+import com.proto.api.Api.GetResponse
+import com.proto.api.Api.RedisPayload
 import io.grpc.stub.StreamObserver
 
 class FeatureStoreService : FeatureStoreGrpc.FeatureStoreImplBase() {
@@ -28,15 +33,12 @@ class FeatureStoreService : FeatureStoreGrpc.FeatureStoreImplBase() {
 
     override fun get(
         request: Api.GetRequest,
-        responseObserver: StreamObserver<Api.GetResponse>
+        responseObserver: StreamObserver<GetResponse>
     ) {
+
         val mapper = RedisRequestMapper()
-        val records = mapper.getRequestMapParser(request)
-        for (key in records) println(redisStorage.getPayload(key))
-        val response = Api.GetResponse.newBuilder()
-            .addAllEntityKeys(records)
-//            .putAllColumns()
-            .build()
+        val response = mapper.getRequestKeysParser(request)
+
         responseObserver.onNext(response)
         responseObserver.onCompleted()
     }

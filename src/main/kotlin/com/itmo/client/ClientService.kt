@@ -23,7 +23,7 @@ class ClientService {
             mutableListOf("age", "height")
         ).build()
         val response = stub.get(request)
-        println(response.entityKeysCount)
+        println(response)
         channel.shutdown()
     }
 
