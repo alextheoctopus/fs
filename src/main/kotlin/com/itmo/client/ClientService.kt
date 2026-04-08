@@ -19,12 +19,13 @@ class ClientService {
     private val stub = FeatureStoreGrpc.newBlockingStub(channel)
 
     fun get() {
-        val request = GetRequest.newBuilder().addAllEntityKeys(mutableListOf("patient1", "patient2")).addAllFeatures(
-            mutableListOf("age", "height")
-        ).build()
+        val request = GetRequest.newBuilder()
+            .addAllEntityKeys(mutableListOf("patient1", "patient2"))
+            .addAllFeatures(mutableListOf("f1", "f2"))
+            .build()
+
         val response = stub.get(request)
         println(response)
-        channel.shutdown()
     }
 
     fun put(/*сюда можно аргументы, которые entities,features, values*/) {
@@ -85,10 +86,52 @@ class ClientService {
         channel.shutdown()
 
     }
+
+    fun preload(entityCount: Int, featureCount: Int) {
+        val entityKeys = (1..entityCount).map { "patient$it" }
+
+        val columns = mutableMapOf<String, FeatureColumn>()
+
+        for (featureIndex in 1..featureCount) {
+            val featureName = "f$featureIndex"
+
+            val values = (1..entityCount).map { entityIndex ->
+                entityIndex * 100 + featureIndex
+            }
+
+            val column = FeatureColumn.newBuilder()
+                .addAllValues(
+                    mutableListOf(
+                        Api.FeatureType.newBuilder()
+                            .setIntValues(
+                                IntColumn.newBuilder()
+                                    .addAllValues(values)
+                                    .build()
+                            )
+                            .build()
+                    )
+                )
+                .build()
+
+            columns[featureName] = column
+        }
+
+        val request = PutRequest.newBuilder()
+            .addAllEntityKeys(entityKeys)
+            .putAllColumns(columns)
+            .build()
+
+        val response = stub.put(request)
+        println("Preload completed. Written entities = ${response.writtenEntities}")
+    }
+
+    fun shutdown() {
+        channel.shutdown()
+    }
 }
 
 fun main() {
     val clientService = ClientService()
     clientService.get()
-
+    clientService.shutdown()
 }

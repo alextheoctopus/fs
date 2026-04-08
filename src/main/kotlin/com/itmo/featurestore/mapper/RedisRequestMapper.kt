@@ -13,7 +13,6 @@ import com.proto.api.Api.RedisPayload
 
 class RedisRequestMapper() {
 
-
     /*getRequest содержит в себе
      → массив ключей
      → массив фичей
@@ -23,6 +22,11 @@ class RedisRequestMapper() {
     распарсить и отдать запрашиваемые фичи
     */
     fun getRequestKeysParser(request: GetRequest): GetResponse {
+        val kotlinEntityValue = loadFromRedis(request)
+        return buildGetResponse(request, kotlinEntityValue)
+    }
+
+    private fun loadFromRedis(request: GetRequest): MutableMap<String, RedisPayload> {
         val keysList = request.entityKeysList;
         val storage = RedisStorage()
         var kotlinEntityValue: MutableMap<String, RedisPayload> = mutableMapOf()
@@ -33,8 +37,14 @@ class RedisRequestMapper() {
             }
             val payload = storage.getPayload("entity:${key}") ?: continue
             kotlinEntityValue[key] = payload
-
         }
+        return kotlinEntityValue
+    }
+
+    fun buildGetResponse(
+        request: GetRequest,
+        kotlinEntityValue: MutableMap<String, RedisPayload>
+    ): GetResponse {
         //Фичи из запроса
         val requestedFeatures = request.featuresList.filter { it.isNotEmpty() }
         val resultColumns = mutableMapOf<String, FeatureColumn>()
@@ -53,6 +63,7 @@ class RedisRequestMapper() {
                 //Извлекли value из фичи
                 val featureValue = payload.featuresMap[featureName] ?: continue
                 when (featureValue.valuesCase) {
+                    //Формируем массив по типам
                     FeatureTypeSingle.ValuesCase.STRING_VALUE -> {
                         detectedType = FeatureTypeSingle.ValuesCase.STRING_VALUE
                         stringValues.add(featureValue.stringValue)
@@ -93,6 +104,7 @@ class RedisRequestMapper() {
                     }
                 }
             }
+            //Приводим тип FeatureTypeSingle → FeatureColumn
             val column = when (detectedType) {
                 FeatureTypeSingle.ValuesCase.INT_VALUE -> {
                     FeatureColumn.newBuilder()
@@ -205,6 +217,7 @@ class RedisRequestMapper() {
             .putAllColumns(resultColumns)
             .build()
     }
+
     fun putRequestMapParser(request: Api.PutRequest): MutableList<EntityRecordRedis> {
         val entityKeys = request.entityKeysList
         val entitiesCount = request.entityKeysCount
@@ -322,5 +335,3 @@ class RedisRequestMapper() {
         return result
     }
 }
-
-
