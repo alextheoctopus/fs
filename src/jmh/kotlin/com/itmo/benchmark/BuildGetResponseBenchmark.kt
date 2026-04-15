@@ -61,8 +61,8 @@ open class BuildGetResponseBenchmark {
         }
     }
 
-    @Benchmark
-    fun buildResponse(state: BenchmarkState): GetResponse {
-        return state.mapper.buildGetResponse(state.request, state.payloads)
-    }
+//    @Benchmark
+//    fun buildResponse(state: BenchmarkState): GetResponse {
+//        return state.mapper.buildGetResponse(state.request, state.payloads)
+//    }
 }

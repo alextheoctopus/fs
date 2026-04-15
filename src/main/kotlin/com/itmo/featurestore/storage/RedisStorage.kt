@@ -9,6 +9,22 @@ class RedisStorage(
     private val port: Int = 6379
 ) {
 
+    fun getPayloads(keys: List<String>): List<RedisPayload?> {
+        if (keys.isEmpty()) return emptyList()
+
+        Jedis(host, port).use { jedis ->
+            val binaryKeys: Array<ByteArray> = keys
+                .map { it.toByteArray() }
+                .toTypedArray()
+
+            val values: List<ByteArray?> = jedis.mget(*binaryKeys)
+
+            return values.map { bytes ->
+                if (bytes == null) null else RedisPayload.parseFrom(bytes)
+            }
+        }
+    }
+
     fun save(record: EntityRecordRedis) {
         Jedis(host, port).use { jedis ->
             jedis.set(record.key.toByteArray(), record.value.toByteArray())
@@ -16,10 +32,14 @@ class RedisStorage(
     }
 
     fun saveAll(records: List<EntityRecordRedis>) {
+        if (records.isEmpty()) return
+
         Jedis(host, port).use { jedis ->
+            val pipeline = jedis.pipelined()
             for (record in records) {
-                jedis.set(record.key.toByteArray(), record.value.toByteArray())
+                pipeline.set(record.key.toByteArray(), record.value.toByteArray())
             }
+            pipeline.sync()
         }
     }
 

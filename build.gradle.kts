@@ -75,3 +75,9 @@ kotlin {
 jmh {
     resultFormat.set("JSON")
 }
+
+tasks.register<JavaExec>("storageBench") {
+    group = "benchmark"
+    mainClass.set("com.itmo.benchmark.StorageBenchmark")
+    classpath = sourceSets["main"].runtimeClasspath
+}

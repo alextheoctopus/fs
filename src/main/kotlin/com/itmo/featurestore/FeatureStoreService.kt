@@ -13,14 +13,12 @@ import com.proto.api.Api.RedisPayload
 import io.grpc.stub.StreamObserver
 
 class FeatureStoreService : FeatureStoreGrpc.FeatureStoreImplBase() {
-
-    private val redisStorage = RedisStorage()
+    val mapper = RedisRequestMapper()
 
     override fun put(request: Api.PutRequest, responseObserver: StreamObserver<PutResponse>) {
-        val mapper = RedisRequestMapper()
         val records = mapper.putRequestMapParser(request)
 
-        redisStorage.saveAll(records)
+        mapper.saveToRedis(records)
 
         val response = PutResponse.newBuilder()
             .setWrittenEntities(records.size)
@@ -36,7 +34,6 @@ class FeatureStoreService : FeatureStoreGrpc.FeatureStoreImplBase() {
         responseObserver: StreamObserver<GetResponse>
     ) {
 
-        val mapper = RedisRequestMapper()
         val response = mapper.getRequestKeysParser(request)
 
         responseObserver.onNext(response)

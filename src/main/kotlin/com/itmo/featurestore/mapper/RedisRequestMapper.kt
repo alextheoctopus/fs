@@ -1,6 +1,5 @@
 package com.itmo.featurestore.mapper
 
-import com.google.protobuf.ByteString
 import com.itmo.featurestore.storage.RedisStorage
 import com.proto.api.Api
 import com.proto.api.Api.EntityRecordRedis
@@ -11,15 +10,17 @@ import com.proto.api.Api.GetRequest
 import com.proto.api.Api.GetResponse
 import com.proto.api.Api.RedisPayload
 
-class RedisRequestMapper() {
+class RedisRequestMapper(
+    private val storage: RedisStorage = RedisStorage()
+) {
 
-    /*getRequest содержит в себе
+    /* getRequest содержит в себе
      → массив ключей
      → массив фичей
 
-    Мы должны извлечь ключи → привести к виду  “entity:$key”
-    потом получить из Redis байтовые строки по этим ключам,
-    распарсить и отдать запрашиваемые фичи
+     Мы должны извлечь ключи → привести к виду "entity:$key"
+     потом получить из Redis payload по этим ключам,
+     распарсить и отдать запрашиваемые фичи
     */
     fun getRequestKeysParser(request: GetRequest): GetResponse {
         val kotlinEntityValue = loadFromRedis(request)
@@ -27,18 +28,36 @@ class RedisRequestMapper() {
     }
 
     private fun loadFromRedis(request: GetRequest): MutableMap<String, RedisPayload> {
-        val keysList = request.entityKeysList;
-        val storage = RedisStorage()
-        var kotlinEntityValue: MutableMap<String, RedisPayload> = mutableMapOf()
-        for (key in keysList) {
-            if (key.isEmpty()) {
-                println("$key is empty")
-                continue
-            }
-            val payload = storage.getPayload("entity:${key}") ?: continue
-            kotlinEntityValue[key] = payload
+        val entityKeys = extractEntityKeys(request)
+        val redisKeys = toRedisKeys(entityKeys)
+        val payloads = getPayloads(redisKeys)
+        return mapPayloadsToEntities(entityKeys, payloads)
+    }
+
+    private fun extractEntityKeys(request: GetRequest): List<String> {
+        return request.entityKeysList.filter { it.isNotEmpty() }
+    }
+
+    private fun toRedisKeys(entityKeys: List<String>): List<String> {
+        return entityKeys.map { "entity:$it" }
+    }
+
+    private fun getPayloads(redisKeys: List<String>): List<RedisPayload?> {
+        return storage.getPayloads(redisKeys)
+    }
+
+    private fun mapPayloadsToEntities(
+        entityKeys: List<String>,
+        payloads: List<RedisPayload?>
+    ): MutableMap<String, RedisPayload> {
+        val result = mutableMapOf<String, RedisPayload>()
+
+        for (i in entityKeys.indices) {
+            val payload = payloads[i] ?: continue
+            result[entityKeys[i]] = payload
         }
-        return kotlinEntityValue
+
+        return result
     }
 
     fun buildGetResponse(
@@ -333,5 +352,9 @@ class RedisRequestMapper() {
         }
 
         return result
+    }
+
+    fun saveToRedis(records: List<EntityRecordRedis>) {
+        storage.saveAll(records)
     }
 }
