@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
 @Warmup(iterations = 10, time = 2)
-@Measurement(iterations = 20, time = 8)
+@Measurement(iterations = 20, time = 5)
 @Fork(3)
 //bзмеряет putRequestMapParser() из RedisRequestMapper
 open class PutRequestMapperBenchmark {
@@ -64,8 +64,8 @@ open class PutRequestMapperBenchmark {
         }
     }
 
-//    @Benchmark
-//    fun mapPutRequest(state: BenchmarkState): MutableList<Api.EntityRecordRedis> {
-//        return state.mapper.putRequestMapParser(state.request)
-//    }
+    @Benchmark
+    fun mapPutRequest(state: BenchmarkState): MutableList<Api.EntityRecordRedis> {
+        return state.mapper.putRequestMapParser(state.request)
+    }
 }
