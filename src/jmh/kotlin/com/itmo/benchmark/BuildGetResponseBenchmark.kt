@@ -10,19 +10,16 @@ import java.util.concurrent.TimeUnit
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
-@Warmup(iterations = 10, time = 2)
-@Measurement(iterations = 20, time = 8)
-@Fork(3)
+@Warmup(iterations = 3, time = 10)
+@Measurement(iterations = 5, time = 10)
+@Fork(1)
 open class BuildGetResponseBenchmark {
 
     @State(Scope.Thread)
     open class BenchmarkState {
 
-        @Param("1000")
-        lateinit var entityCount: String
-
-        @Param("10")
-        lateinit var featureCount: String
+        @Param("1x1", "1x10", "10x1", "10x10", "1000x10", "1000x100")
+        lateinit var scenario: String
 
         lateinit var mapper: RedisRequestMapper
         lateinit var request: GetRequest
@@ -32,8 +29,9 @@ open class BuildGetResponseBenchmark {
         fun setup() {
             mapper = RedisRequestMapper()
 
-            val entities = entityCount.toInt()
-            val features = featureCount.toInt()
+            val parts = scenario.split("x")
+            val entities = parts[0].toInt()
+            val features = parts[1].toInt()
 
             val featureNames = (1..features).map { "f$it" }
 
@@ -61,8 +59,8 @@ open class BuildGetResponseBenchmark {
         }
     }
 
-//    @Benchmark
-//    fun buildResponse(state: BenchmarkState): GetResponse {
-//        return state.mapper.buildGetResponse(state.request, state.payloads)
-//    }
+    @Benchmark
+    fun buildResponse(state: BenchmarkState): GetResponse {
+        return state.mapper.buildGetResponse(state.request, state.payloads)
+    }
 }

@@ -28,7 +28,7 @@ class FeatureStoreService : FeatureStoreGrpc.FeatureStoreImplBase() {
         responseObserver.onNext(response)
         responseObserver.onCompleted()
     }
-
+//
     override fun get(
         request: Api.GetRequest,
         responseObserver: StreamObserver<GetResponse>

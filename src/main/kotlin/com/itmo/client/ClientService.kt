@@ -23,9 +23,8 @@ class ClientService {
             .addAllEntityKeys(mutableListOf("patient1", "patient2"))
             .addAllFeatures(mutableListOf("f1", "f2"))
             .build()
-
+//grpc вызов на сервер 9090
         val response = stub.get(request)
-        println(response)
     }
 
     fun put(/*сюда можно аргументы, которые entities,features, values*/) {

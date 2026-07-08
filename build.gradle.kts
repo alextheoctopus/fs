@@ -81,3 +81,19 @@ tasks.register<JavaExec>("storageBench") {
     mainClass.set("com.itmo.benchmark.StorageBenchmark")
     classpath = sourceSets["main"].runtimeClasspath
 }
+
+tasks.register<JavaExec>("fullGetBench") {
+    group = "benchmark"
+    mainClass.set("com.itmo.benchmark.FullGetBenchmark")
+    classpath = sourceSets["main"].runtimeClasspath
+}
+
+tasks.register<JavaExec>("featureStoreServer") {
+    group = "application"
+    mainClass.set("com.itmo.featurestore.FeatureStoreServerKt")
+    classpath = sourceSets["main"].runtimeClasspath
+}
+jmh {
+    resultFormat.set("JSON")
+    includes.set(listOf(".*BuildGetResponseBenchmark.*"))
+}
